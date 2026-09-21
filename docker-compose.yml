@@ -19,7 +19,7 @@ services:
       postgresql:
         condition: service_healthy
     environment:
-      DB: postgresql12
+      DB: postgres12
       DB_PORT: 5432
       POSTGRES_USER: temporal
       POSTGRES_PWD: temporal
