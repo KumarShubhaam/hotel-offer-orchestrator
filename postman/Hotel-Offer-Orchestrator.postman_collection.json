@@ -1,0 +1,80 @@
+{
+  "info": {
+    "name": "Hotel Offer Orchestrator",
+    "description": "Mock supplier APIs (Supplier A, Supplier B) and the Aggregator API that orchestrates comparison via Temporal.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "supplierABaseUrl", "value": "http://localhost:3000" },
+    { "key": "supplierBBaseUrl", "value": "http://localhost:3001" },
+    { "key": "aggregatorBaseUrl", "value": "http://localhost:4000" }
+  ],
+  "item": [
+    {
+      "name": "Supplier A - Get Hotels",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{supplierABaseUrl}}/supplierA/hotels",
+          "host": ["{{supplierABaseUrl}}"],
+          "path": ["supplierA", "hotels"]
+        }
+      }
+    },
+    {
+      "name": "Supplier B - Get Hotels",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{supplierBBaseUrl}}/supplierB/hotels",
+          "host": ["{{supplierBBaseUrl}}"],
+          "path": ["supplierB", "hotels"]
+        }
+      }
+    },
+    {
+      "name": "Aggregator - Get Hotels by City",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{aggregatorBaseUrl}}/api/hotels?city=delhi",
+          "host": ["{{aggregatorBaseUrl}}"],
+          "path": ["api", "hotels"],
+          "query": [
+            { "key": "city", "value": "delhi" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Aggregator - Get Hotels by City with Price Filter",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{aggregatorBaseUrl}}/api/hotels?city=delhi&minPrice=5000&maxPrice=6000",
+          "host": ["{{aggregatorBaseUrl}}"],
+          "path": ["api", "hotels"],
+          "query": [
+            { "key": "city", "value": "delhi" },
+            { "key": "minPrice", "value": "5000" },
+            { "key": "maxPrice", "value": "6000" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Aggregator - Get Hotels by City (Jaipur, Supplier B only)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{aggregatorBaseUrl}}/api/hotels?city=jaipur",
+          "host": ["{{aggregatorBaseUrl}}"],
+          "path": ["api", "hotels"],
+          "query": [
+            { "key": "city", "value": "jaipur" }
+          ]
+        }
+      }
+    }
+  ]
+}
