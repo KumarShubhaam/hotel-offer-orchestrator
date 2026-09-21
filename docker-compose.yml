@@ -1,6 +1,7 @@
 services:
   postgresql:
     image: postgres:13-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: temporal
       POSTGRES_PASSWORD: temporal
@@ -15,6 +16,7 @@ services:
 
   temporal:
     image: temporalio/auto-setup:latest
+    restart: unless-stopped
     depends_on:
       postgresql:
         condition: service_healthy
@@ -29,6 +31,7 @@ services:
 
   temporal-ui:
     image: temporalio/ui:latest
+    restart: unless-stopped
     depends_on:
       - temporal
     environment:
@@ -58,6 +61,7 @@ services:
     build:
       context: ./Aggregator
     command: ["node", "dist/index.js"]
+    restart: unless-stopped
     ports:
       - "4000:4000"
     environment:
@@ -71,6 +75,7 @@ services:
     build:
       context: ./Aggregator
     command: ["node", "dist/temporal/worker.js"]
+    restart: unless-stopped
     environment:
       REDIS_URL: redis://redis:6379
       TEMPORAL_ADDRESS: temporal:7233
