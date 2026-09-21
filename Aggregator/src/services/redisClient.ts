@@ -5,6 +5,11 @@ const TTL_SECONDS = 300;
 
 const redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
 
+// ioredis throws on unhandled 'error' events by default, which would crash the process on any connection blip
+redis.on('error', (error) => {
+  console.error('Redis client error:', error);
+});
+
 export function cacheKey(city: string): string {
   return `hotels:${city.trim().toLowerCase()}`;
 }

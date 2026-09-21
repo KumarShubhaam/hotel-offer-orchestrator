@@ -3,11 +3,13 @@ import { TASK_QUEUE } from './taskQueue.js';
 import type { ApiHotel } from '../types/hotel.js';
 
 const TEMPORAL_ADDRESS = process.env.TEMPORAL_ADDRESS ?? 'localhost:7233';
+const MAX_CONNECT_ATTEMPTS = Number(process.env.TEMPORAL_CONNECT_MAX_ATTEMPTS ?? 40);
+const CONNECT_RETRY_DELAY_MS = Number(process.env.TEMPORAL_CONNECT_RETRY_DELAY_MS ?? 3000);
 
 let clientPromise: Promise<Client> | null = null;
 
-// Temporal server boots slower than this container, so keep retrying instead of failing on the first attempt
-async function connectWithRetry(maxAttempts = 10, delayMs = 2000): Promise<Connection> {
+// auto-setup's schema init on a cold Temporal server can easily take over a minute, so keep retrying generously
+async function connectWithRetry(maxAttempts = MAX_CONNECT_ATTEMPTS, delayMs = CONNECT_RETRY_DELAY_MS): Promise<Connection> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await Connection.connect({ address: TEMPORAL_ADDRESS });

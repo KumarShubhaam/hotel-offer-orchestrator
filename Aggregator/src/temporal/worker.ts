@@ -7,9 +7,11 @@ import { TASK_QUEUE } from './taskQueue.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPORAL_ADDRESS = process.env.TEMPORAL_ADDRESS ?? 'localhost:7233';
+const MAX_CONNECT_ATTEMPTS = Number(process.env.TEMPORAL_CONNECT_MAX_ATTEMPTS ?? 40);
+const CONNECT_RETRY_DELAY_MS = Number(process.env.TEMPORAL_CONNECT_RETRY_DELAY_MS ?? 3000);
 
-// Temporal server boots slower than this container, so keep retrying instead of failing on the first attempt
-async function connectWithRetry(maxAttempts = 10, delayMs = 2000): Promise<NativeConnection> {
+// auto-setup's schema init on a cold Temporal server can easily take over a minute, so keep retrying generously
+async function connectWithRetry(maxAttempts = MAX_CONNECT_ATTEMPTS, delayMs = CONNECT_RETRY_DELAY_MS): Promise<NativeConnection> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await NativeConnection.connect({ address: TEMPORAL_ADDRESS });

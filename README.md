@@ -77,7 +77,7 @@ Both return a bare array of `{ hotelId, name, price, city, commisionPct }`. Supp
 docker compose up --build
 ```
 
-This starts 8 containers: `postgresql`, `temporal` (auto-setup), `temporal-ui`, `redis`, `supplier-a`, `supplier-b`, `aggregator-api`, `aggregator-worker`. Give Temporal ~30-60s after startup to finish its schema setup before hitting the API — the Aggregator retries its Temporal connection (10 attempts, 2s apart) if it's not ready yet.
+This starts 8 containers: `postgresql`, `temporal` (auto-setup), `temporal-ui`, `redis`, `supplier-a`, `supplier-b`, `aggregator-api`, `aggregator-worker`. Give Temporal ~30-60s after startup to finish its schema setup before hitting the API — the Aggregator retries its Temporal connection (40 attempts, 3s apart by default, configurable via `TEMPORAL_CONNECT_MAX_ATTEMPTS`/`TEMPORAL_CONNECT_RETRY_DELAY_MS`) if it's not ready yet.
 
 > **Note:** the Aggregator's supplier URLs are hardcoded to the docker-compose service hostnames (`http://supplier-a:3000/...`, `http://supplier-b:3001/...`), so the full stack currently only runs via docker-compose — running the three services standalone with `npm run dev` won't let the Aggregator reach the suppliers.
 
