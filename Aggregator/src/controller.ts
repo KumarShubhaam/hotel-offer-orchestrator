@@ -17,11 +17,16 @@ class Controller {
     }
 
     let hotels: ApiHotel[];
-    try {
-      hotels = await runHotelComparisonWorkflow(city);
-    } catch (error) {
-      console.error('hotelComparisonWorkflow failed:', error);
-      return res.status(502).send({msg: 'Failed to fetch hotels via Temporal workflow'});
+    const cached = await getCachedHotels(city).catch(() => null);
+    if (cached) {
+      hotels = cached;
+    } else {
+      try {
+        hotels = await runHotelComparisonWorkflow(city);
+      } catch (error) {
+        console.error('hotelComparisonWorkflow failed:', error);
+        return res.status(502).send({msg: 'Failed to fetch hotels via Temporal workflow'});
+      }
     }
 
     if (minPrice === undefined && maxPrice === undefined) {
@@ -30,11 +35,7 @@ class Controller {
 
     const min = minPrice !== undefined ? Number(minPrice) : 0;
     const max = maxPrice !== undefined ? Number(maxPrice) : Number.POSITIVE_INFINITY;
-
-    // the workflow's cache activity just wrote this city's list to redis; re-read it to filter "inside redis's cached data"
-    const cached = await getCachedHotels(city).catch(() => null);
-    const source = cached ?? hotels;
-    return res.status(200).send(source.filter((hotel) => hotel.price >= min && hotel.price <= max));
+    return res.status(200).send(hotels.filter((hotel) => hotel.price >= min && hotel.price <= max));
   }
 }
 
